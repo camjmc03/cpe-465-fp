@@ -1,5 +1,5 @@
-server_ip: 127.0.0.1
+server_ip: 208.94.60.153
 upstream_dns: 8.8.8.8
-interface: lo0
+interface: en24
 dns_port: 53
-debug_level: 1
+debug_level: 2

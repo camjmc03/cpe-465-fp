@@ -18,7 +18,10 @@ Instructions for building and running the server:
     ```sh
     ./build.sh
     ```
-
+4. set settings in the config.yaml file
+    - make sure the IP matches the IP for the interface you wish to serve DNS requests on. 
+    - level 1 debug: 
+    - level 2 debug: 
 5. Run the runner script 
     ```sh
     ../run.sh

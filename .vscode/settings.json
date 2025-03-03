@@ -1,3 +1,7 @@
 {
-    "makefile.makePath": "/usr/bin/make"
+    "makefile.makePath": "/usr/bin/make",
+    "files.associations": {
+        "*.c": "c",
+        "ios": "cpp"
+    }
 }
