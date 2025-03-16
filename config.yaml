@@ -1,4 +1,4 @@
-server_ip: 208.94.60.153
+server_ip: 208.94.60.155
 upstream_dns: 8.8.8.8
 interface: en24
 dns_port: 53

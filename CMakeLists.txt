@@ -23,7 +23,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Add the executable
-add_executable(dns_server server.cpp dns_cache.cpp)
+add_executable(dns_server server.cpp)
 
 # Link YAML-CPP and pcap with the executable
 target_link_libraries(dns_server yaml-cpp ${PCAP_LIBRARIES})
