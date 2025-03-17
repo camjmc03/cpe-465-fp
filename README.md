@@ -1,6 +1,9 @@
 Cameron McClure-Coleman
+
 Advanced Networks (CPE 465)
+
 Final Project
+
 Custom DNS Server
 
 This package is intended to be deployed on a raspberry pi running raspbian server. I have also 
