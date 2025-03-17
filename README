@@ -13,7 +13,7 @@ Instructions for building and running the server:
 
 2. Clone the repository
     ```sh
-    git clone <repository link>
+    git clone https://github.com/camjmc03/cpe-465-fp.git
     ```
 
 3. run the build script
