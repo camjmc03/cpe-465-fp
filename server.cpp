@@ -8,13 +8,19 @@
 #include <netinet/in.h>
 #include <time.h>
 #include <yaml-cpp/yaml.h>
+#include <net/if.h>
+#include <ifaddrs.h>
 
 // Define states for DNS requests
 typedef enum {
-    RECEIVED,
-    FORWARDED,
-    RESPONSE_RECEIVED,
-    SENT
+    RECIEVED_QUERY,
+    PARSE_QUERY,
+    CACHE_CHECK,
+    PENDING_RECURSION,
+    PARSE_RECURSION,
+    GENERATE_RESPONSE,
+    SEND_RESPONSE,
+    DONE
 } RequestState;
 
 // Structure to represent a DNS cache entry
@@ -38,7 +44,6 @@ struct DnsCacheEntry dnsCache[CACHE_SIZE];
 // Global variables for configuration
 std::string server_ip;
 std::string upstream_dns;
-std::string interface;
 int dns_port;
 int debug_level;
 
@@ -48,7 +53,6 @@ void loadConfig() {
         YAML::Node config = YAML::LoadFile("config.yaml");
         server_ip = config["server_ip"].as<std::string>();
         upstream_dns = config["upstream_dns"].as<std::string>();
-        interface = config["interface"].as<std::string>();
         dns_port = config["dns_port"].as<int>();
         debug_level = config["debug_level"].as<int>();
 
@@ -56,7 +60,6 @@ void loadConfig() {
             printf("[DEBUG] Loaded configuration:\n");
             printf("  Server IP: %s\n", server_ip.c_str());
             printf("  Upstream DNS: %s\n", upstream_dns.c_str());
-            printf("  Interface: %s\n", interface.c_str());
             printf("  DNS Port: %d\n", dns_port);
             printf("  Debug Level: %d\n", debug_level);
         }
@@ -79,13 +82,16 @@ void parseDnsQuery(uint8_t *query, char *domainName) {
     }
     domainName[pos - 1] = '\0';
 
-    if (debug_level >= 2) {
+    if (debug_level >= 3) {
         printf("[DEBUG] Parsed domain name: %s\n", domainName);
     }
 }
 
 // Function to check if the DNS response is in the cache
 int isResponseCached(const char *domainName, uint8_t *response, uint16_t transactionID) {
+    if (debug_level >= 2) {
+        printf("[DEBUG] Checking cache for domain: %s\n", domainName);
+    }
     for (int i = 0; i < CACHE_SIZE; i++) {
         if (dnsCache[i].expiry > time(NULL)) {
             char cachedDomain[256];
@@ -141,19 +147,23 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    // Bind socket to port 53
+    // Attempt to bind socket to the IP address specified in config.yaml
     memset(&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = INADDR_ANY;
-    serverAddr.sin_port = htons(53);
+    serverAddr.sin_addr.s_addr = inet_addr(server_ip.c_str());
+    serverAddr.sin_port = htons(dns_port);
+    // if server ip or port not given, skip binding to specific IP or port
+    if ( server_ip == "default" ) {
+        printf("[INFO] \"default\" given for IP, binding to first available IP\n");
+        serverAddr.sin_addr.s_addr = INADDR_ANY;
+    }
     if (bind(sockfd, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
         perror("bind");
         exit(EXIT_FAILURE);
     }
-
     if (debug_level >= 1) {
-        printf("[DEBUG] DNS server started on interface %s, IP %s, port %d\n",
-               interface.c_str(), server_ip.c_str(), dns_port);
+        // print the server IP and port
+        printf("[DEBUG] Listening on %s:%d\n", server_ip.c_str(), dns_port);
     }
 
     // Set up upstream DNS server address (e.g., 8.8.8.8)

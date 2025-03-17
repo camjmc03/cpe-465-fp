@@ -1,5 +1,4 @@
-server_ip: 208.94.60.155
+server_ip: default # "default" to use first availabale IP
 upstream_dns: 8.8.8.8
-interface: en24
-dns_port: 53
+dns_port: 53 # 53 is default dns port
 debug_level: 2
