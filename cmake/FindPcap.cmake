@@ -7,6 +7,9 @@
 # and then calls find_package(Pcap REQUIRED) to find the pcap library.
 # This will trigger the execution of the FindPcap.cmake script.
 
+# this was the best way I could figure out to get the pcap library to be found for my 
+# laptop and the lab machines
+
 find_path(PCAP_INCLUDE_DIR pcap.h)
 find_library(PCAP_LIBRARY NAMES pcap)
 
